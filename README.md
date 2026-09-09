@@ -3,11 +3,19 @@
 Predicting 30-day hospital readmission using structured clinical data from the
 UCI Diabetes 130-US Hospitals dataset.
 
-This project compares a regularized logistic regression, two PyTorch neural
-networks, and XGBoost on approximately 70,000 unique patients. The main goal was
-not simply to maximize a metric. I wanted to build the prediction problem
-carefully, avoid leakage, evaluate probability quality, and understand what
-information the models were actually using.
+The project compares logistic regression, PyTorch neural networks, and XGBoost
+on approximately 70,000 unique patients. The goal was to build the prediction
+problem carefully, control leakage, evaluate probability quality, and understand
+which features drove model performance.
+
+## At a Glance
+
+- **Cohort:** 69,990 unique patients with an 8.98% 30-day readmission rate
+- **Inputs:** 42 predictors available by hospital discharge
+- **Models:** Logistic regression, one-hot PyTorch MLP, embedding PyTorch MLP, and XGBoost
+- **Evaluation:** ROC-AUC, PR-AUC, Brier score, calibration, and validation-selected operating thresholds
+- **Best held-out result:** XGBoost with 0.6564 ROC-AUC and 0.1802 PR-AUC
+- **Main finding:** More flexible models produced only modest gains over logistic regression, while discharge disposition and prior inpatient utilization consistently carried the strongest predictive signal
 
 ## Project Summary
 
