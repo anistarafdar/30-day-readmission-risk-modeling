@@ -14,7 +14,7 @@ which features drove model performance.
 - **Inputs:** 42 predictors available by hospital discharge
 - **Models:** Logistic regression, one-hot PyTorch MLP, embedding PyTorch MLP, and XGBoost
 - **Evaluation:** ROC-AUC, PR-AUC, Brier score, calibration, and validation-selected operating thresholds
-- **Best held-out result:** XGBoost with 0.6564 ROC-AUC and 0.1802 PR-AUC
+- **Best test result:** XGBoost reached 0.6564 ROC-AUC and 0.1802 PR-AUC in the post-hoc exploratory comparison
 - **Main finding:** More flexible models produced only modest gains over logistic regression, while discharge disposition and prior inpatient utilization consistently carried the strongest predictive signal
 
 ## Project Summary
@@ -24,15 +24,11 @@ The prediction task is:
 > Using information available by hospital discharge, estimate the probability
 > that a patient with diabetes will be readmitted within 30 days.
 
-The final cohort contains:
+The binary outcome is 30-day readmission, with readmissions after 30 days and
+no readmission treated as the negative class. The final cohort was divided into
+70% training, 15% validation, and 15% test sets using stratified random splits.
 
-- 69,990 unique patients
-- 6,285 readmissions within 30 days
-- 8.98% positive-class prevalence
-- 42 predictors
-- 70% training, 15% validation, and 15% test split
-
-The main analysis compares logistic regression with a PyTorch multilayer
+The original analysis compares logistic regression with a PyTorch multilayer
 perceptron. XGBoost and an embedding-based PyTorch model were later added as
 exploratory extensions.
 
@@ -70,7 +66,7 @@ risk model.
 
 ## Feature Engineering
 
-The final model uses 42 predictors:
+The final feature set contains 42 predictors:
 
 - 8 numeric features
 - 34 categorical features
@@ -112,22 +108,12 @@ encoded.
 ### PyTorch MLP
 
 The main nonlinear model is a small multilayer perceptron implemented in
-PyTorch:
+PyTorch. It takes the 183 preprocessed input features and passes them through
+two hidden layers with 64 and 32 units before producing a single output logit.
 
-```text
-183 processed features
-        |
-       64
-        |
-       32
-        |
-   output logit
-```
-
-The network uses ReLU activations, dropout, Adam optimization, and
-`BCEWithLogitsLoss`.
-
-Early stopping was based on validation loss.
+ReLU activations and dropout are used between hidden layers. The model is
+trained with Adam and `BCEWithLogitsLoss`, with early stopping based on
+validation loss.
 
 ### Exploratory XGBoost
 
@@ -210,6 +196,12 @@ This is an important limitation for practical use.
 
 Permutation importance was calculated at the level of the original 42
 predictors.
+
+![Permutation importance of the top predictors](images/logistic_regression_permutation_importance.png)
+
+*Validation-set permutation importance for logistic regression. Discharge
+disposition and prior inpatient utilization produced the largest decreases in
+ROC-AUC when shuffled.*
 
 The strongest predictors were:
 
@@ -355,10 +347,11 @@ than independent confirmatory experiments.
 |
 |-- README.md
 |-- hospital_readmission_modeling.ipynb
+|-- requirements.txt
+|
+`-- images/
+    `-- logistic_regression_permutation_importance.png
 ```
-
-The full analysis, outputs, interpretation, and methodological notes are
-contained in the notebook.
 
 ## References
 
@@ -368,5 +361,3 @@ UCI Machine Learning Repository.
 Strack B, DeShazo JP, Gennings C, et al.
 *Impact of HbA1c Measurement on Hospital Readmission Rates: Analysis of 70,000
 Clinical Database Patient Records.* BioMed Research International, 2014.
-
-```
