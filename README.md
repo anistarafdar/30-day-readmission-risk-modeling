@@ -114,7 +114,7 @@ PyTorch:
        32
         |
    output logit
-````
+```
 
 The network uses ReLU activations, dropout, Adam optimization, and
 `BCEWithLogitsLoss`.
